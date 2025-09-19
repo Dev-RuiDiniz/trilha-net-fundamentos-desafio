@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Globalization;
 
 namespace DesafioFundamentos.Models
 {
@@ -16,11 +17,9 @@ namespace DesafioFundamentos.Models
             this.precoPorHora = precoPorHora;
         }
 
-        public void AdicionarVeiculo()
+        // Adicionar veículo recebendo a placa como parâmetro
+        public void AdicionarVeiculo(string placa)
         {
-            // Pedir placa ao usuário e adicionar na lista
-            Console.WriteLine("Digite a placa do veículo para estacionar:");
-            string placa = Console.ReadLine();
             veiculos.Add(placa);
             Console.WriteLine($"Veículo {placa} adicionado com sucesso!");
         }
@@ -33,16 +32,21 @@ namespace DesafioFundamentos.Models
             // Verifica se o veículo existe
             if (veiculos.Any(x => x.ToUpper() == placa.ToUpper()))
             {
-                Console.WriteLine("Digite a quantidade de horas que o veículo permaneceu estacionado:");
-                
-                // Pegar horas e calcular valor total
-                int horas = int.Parse(Console.ReadLine());
+                int horas;
+                while (true)
+                {
+                    Console.WriteLine("Digite a quantidade de horas que o veículo permaneceu estacionado:");
+                    if (int.TryParse(Console.ReadLine(), out horas) && horas >= 0)
+                        break;
+                    Console.WriteLine("Quantidade inválida. Digite um número inteiro válido de horas.");
+                }
+
                 decimal valorTotal = precoInicial + (precoPorHora * horas);
 
-                // Remover veículo da lista
+                // Remove todos os veículos com a placa informada (case-insensitive)
                 veiculos.RemoveAll(x => x.ToUpper() == placa.ToUpper());
 
-                Console.WriteLine($"O veículo {placa} foi removido e o preço total foi de: R$ {valorTotal}");
+                Console.WriteLine($"O veículo {placa} foi removido e o preço total foi de: {valorTotal.ToString("C", CultureInfo.GetCultureInfo("pt-BR"))}");
             }
             else
             {
@@ -52,7 +56,6 @@ namespace DesafioFundamentos.Models
 
         public void ListarVeiculos()
         {
-            // Verifica se há veículos no estacionamento
             if (veiculos.Any())
             {
                 Console.WriteLine("Os veículos estacionados são:");
